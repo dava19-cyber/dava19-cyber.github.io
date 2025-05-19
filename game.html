@@ -65,7 +65,7 @@
       margin-top: 20px;
       padding: 10px 20px;
       background-color: #2563eb;
-      border: white;
+      border: none;
       border-radius: 6px;
       color: white;
       font-size: 16px;
@@ -95,11 +95,18 @@
   <button onclick="resetGame()">Main Lagi</button>
   <button onclick="logout()">Keluar</button>
 
+  <audio id="clickSound" src="https://www.soundjay.com/button/sounds/button-3.mp3"></audio>
+  <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
+  <audio id="drawSound" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
+
   <script>
     const board = document.getElementById("board");
     const result = document.getElementById("result");
     const playerScoreEl = document.getElementById("playerScore");
     const computerScoreEl = document.getElementById("computerScore");
+    const clickSound = document.getElementById("clickSound");
+    const winSound = document.getElementById("winSound");
+    const drawSound = document.getElementById("drawSound");
     const modeSelect = document.getElementById("mode");
     const playerName = document.getElementById("playerName");
 
