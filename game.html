@@ -16,6 +16,11 @@
       color: #60a5fa;
     }
 
+    #playerInfo {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
     #modeSelect {
       margin-top: 10px;
     }
@@ -74,6 +79,7 @@
 </head>
 <body>
   <h1>Tic Tac Toe</h1>
+  <div id="playerInfo">Selamat datang, <span id="playerName"></span>!</div>
 
   <div id="modeSelect">
     <label for="mode">Pilih Mode:</label>
@@ -87,6 +93,7 @@
   <div id="board"></div>
   <div id="result"></div>
   <button onclick="resetGame()">Main Lagi</button>
+  <button onclick="logout()">Keluar</button>
 
   <audio id="clickSound" src="https://www.soundjay.com/button/sounds/button-3.mp3"></audio>
   <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
@@ -101,6 +108,15 @@
     const winSound = document.getElementById("winSound");
     const drawSound = document.getElementById("drawSound");
     const modeSelect = document.getElementById("mode");
+    const playerName = document.getElementById("playerName");
+
+    // Ambil nama dari localStorage
+    const storedName = localStorage.getItem("playerName");
+    if (!storedName) {
+      window.location.href = "index.html"; // redirect jika belum login
+    } else {
+      playerName.textContent = storedName;
+    }
 
     let currentPlayer = "X";
     let cells = ["", "", "", "", "", "", "", "", ""];
@@ -148,7 +164,7 @@
       if (mode === "vsFriend") {
         currentPlayer = currentPlayer === "X" ? "O" : "X";
       } else if (mode === "vsComputer" && currentPlayer === "X") {
-        gameOver = true; // cegah klik selama giliran komputer
+        gameOver = true;
         setTimeout(() => {
           computerMove();
           gameOver = false;
@@ -202,6 +218,11 @@
       currentPlayer = "X";
       gameOver = false;
       renderBoard();
+    }
+
+    function logout() {
+      localStorage.removeItem("playerName");
+      window.location.href = "index.html";
     }
 
     renderBoard();
