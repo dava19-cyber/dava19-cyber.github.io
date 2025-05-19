@@ -14,11 +14,9 @@
       height: 100vh;
       flex-direction: column;
     }
-
     h1 {
       color: #60a5fa;
     }
-
     input, button {
       padding: 10px;
       margin: 10px;
@@ -26,17 +24,14 @@
       border-radius: 6px;
       border: none;
     }
-
     input {
       width: 200px;
     }
-
     button {
       background-color: #2563eb;
       color: white;
       cursor: pointer;
     }
-
     button:hover {
       background-color: #1d4ed8;
     }
@@ -51,8 +46,8 @@
     function login() {
       const name = document.getElementById("username").value.trim();
       if (name !== "") {
-        localStorage.setItem("playerName", name); // Simpan nama pemain
-        window.location.href = "game.html"; // Arahkan ke halaman game
+        localStorage.setItem("playerName", name);
+        window.location.href = "game.html";
       } else {
         alert("Silakan masukkan nama terlebih dahulu.");
       }
