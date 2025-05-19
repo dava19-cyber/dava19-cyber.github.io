@@ -2,141 +2,50 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tic-Tac-Toe • Game</title>
+  <title>Login | Tic Tac Toe</title>
   <style>
-    :root { --bg:#0f1828; --fg:#ffffff; --accent:#3ba2ff; }
-    *{box-sizing:border-box;font-family:system-ui,Arial,sans-serif}
-    body{
-      margin:0;padding:2rem;min-height:100vh;background:var(--bg);color:var(--fg);
-      display:flex;flex-direction:column;align-items:center;gap:1.5rem
+    body {
+      background-color: #111827;
+      color: #f9fafb;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
     }
-    h1{margin:0;color:var(--accent);font-size:3rem}
-    select#mode{
-      color:var(--fg);background:var(--bg);border:1px solid #ffffff33;
-      padding:.35rem .7rem;border-radius:.4rem;font-size:1rem
+    h1 { color: #60a5fa; }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
     }
-    select#mode option{color:var(--fg);background:var(--bg)}
-    #board{
-      display:grid;grid-template-columns:repeat(3,100px);gap:10px;margin-top:1rem;
-      background-color:#1e293b;padding:10px;border-radius:8px;
+    input { width: 200px; }
+    button {
+      background-color: #2563eb;
+      color: white;
+      cursor: pointer;
     }
-    .cell{
-      width:100px;height:100px;display:flex;align-items:center;justify-content:center;
-      font-size:3rem;border:2px solid var(--fg);border-radius:.4rem;cursor:pointer;
-      user-select:none
-    }
-    button.basic{
-      padding:.5rem 1.2rem;border:none;border-radius:.5rem;margin-top:1rem;
-      background:var(--accent);color:#fff;font-size:1rem;cursor:pointer;
-    }
-    button.basic:hover{filter:brightness(1.1)}
+    button:hover { background-color: #1d4ed8; }
   </style>
 </head>
 <body>
-
-  <h1>Tic Tac Toe</h1>
-
-  <div>
-    <label for="mode">Pilih Mode:</label>
-    <select id="mode">
-      <option value="vsFriend">Vs Teman</option>
-      <option value="vsComputer">Vs Komputer</option>
-    </select>
-  </div>
-
-  <div id="score">Skor: <span id="playerName"></span> <span id="playerScore">0</span> – <span id="computerScore">0</span></div>
-  <div id="result"></div>
-  <div id="board"></div>
-
-  <button class="basic" onclick="resetGame()">Ulangi</button>
-  <button class="basic" onclick="logout()">Keluar</button>
+  <h1>Login Tic Tac Toe</h1>
+  <input type="text" id="username" placeholder="Masukkan nama" required />
+  <button onclick="login()">Masuk</button>
 
   <script>
-    const board           = document.getElementById("board");
-    const result          = document.getElementById("result");
-    const playerScoreEl   = document.getElementById("playerScore");
-    const computerScoreEl = document.getElementById("computerScore");
-    const modeSelect      = document.getElementById("mode");
-    const playerNameEl    = document.getElementById("playerName");
-
-    const storedName = localStorage.getItem("playerName");
-    if (!storedName) { location.href = "index.html"; }
-    else { playerNameEl.textContent = storedName; }
-
-    let currentPlayer = "X";
-    let cells         = Array(9).fill("");
-    let gameOver      = false;
-    let playerScore   = 0;
-    let computerScore = 0;
-
-    function renderBoard(){
-      board.innerHTML="";
-      cells.forEach((cell,i)=>{
-        const div=document.createElement("div");
-        div.className="cell";
-        div.textContent=cell;
-        div.addEventListener("click",()=>handleMove(i));
-        board.appendChild(div);
-      });
-    }
-
-    function handleMove(i){
-      if(cells[i]!==""||gameOver) return;
-      const mode=modeSelect.value;
-      cells[i]=currentPlayer;
-      renderBoard();
-
-      if(checkWinner(currentPlayer)){
-        (currentPlayer==="X"?playerScore:computerScore)++;
-        updateScore();
-        result.textContent=`${currentPlayer==="X"?storedName:"Komputer"} menang!`;
-        gameOver=true; return;
-      }
-      if(isDraw()){ result.textContent="Seri!"; gameOver=true; return; }
-
-      if(mode==="vsFriend"){
-        currentPlayer=currentPlayer==="X"?"O":"X";
-      }else if(mode==="vsComputer"&&currentPlayer==="X"){
-        gameOver=true;
-        setTimeout(()=>{ computerMove(); gameOver=false; },500);
+    function login() {
+      const name = document.getElementById("username").value.trim();
+      if (name !== "") {
+        localStorage.setItem("playerName", name);
+        window.location.href = "game.html";
+      } else {
+        alert("Silakan masukkan nama terlebih dahulu.");
       }
     }
-
-    function computerMove(){
-      const empty=cells.map((v,i)=>v===""?i:null).filter(v=>v!==null);
-      if(empty.length===0) return;
-      const move=empty[Math.floor(Math.random()*empty.length)];
-      cells[move]="O";
-      renderBoard();
-      if(checkWinner("O")){ computerScore++; updateScore();
-        result.textContent="Komputer menang!"; gameOver=true; return; }
-      if(isDraw()){ result.textContent="Seri!"; gameOver=true; }
-    }
-
-    function checkWinner(p){
-      const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-      return w.some(c=>c.every(i=>cells[i]===p));
-    }
-
-    const isDraw=()=>cells.every(c=>c!=="")&&!checkWinner("X")&&!checkWinner("O");
-
-    function updateScore(){
-      playerScoreEl.textContent=playerScore;
-      computerScoreEl.textContent=computerScore;
-    }
-
-    function resetGame(){
-      cells=Array(9).fill(""); result.textContent="";
-      currentPlayer="X"; gameOver=false; renderBoard();
-    }
-
-    function logout(){
-      localStorage.removeItem("playerName");
-      location.href="index.html";
-    }
-
-    renderBoard();
   </script>
 </body>
 </html>
