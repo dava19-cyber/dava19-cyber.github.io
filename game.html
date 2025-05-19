@@ -2,50 +2,171 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Login | Tic Tac Toe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic-Tac-Toe • Game</title>
   <style>
+    :root { --bg:#0f1828; --fg:#ffffff; --accent:#3ba2ff; }
+    * { box-sizing:border-box; font-family:sans-serif; }
     body {
-      background-color: #111827;
-      color: #f9fafb;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
+      margin:0; padding:2rem; min-height:100vh; background:var(--bg); color:var(--fg);
+      display:flex; flex-direction:column; align-items:center; gap:1.5rem;
     }
-    h1 { color: #60a5fa; }
-    input, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
+    h1 { margin:0; color:var(--accent); font-size:3rem; }
+    select#mode {
+      color:var(--fg); background:var(--bg); border:1px solid #ffffff33;
+      padding:.4rem .8rem; border-radius:.4rem; font-size:1rem;
     }
-    input { width: 200px; }
-    button {
-      background-color: #2563eb;
-      color: white;
-      cursor: pointer;
+    #score, #result { font-size:1.2rem; }
+    #board {
+      display:grid; grid-template-columns:repeat(3,100px); gap:10px; margin-top:1rem;
     }
-    button:hover { background-color: #1d4ed8; }
+    .cell {
+      width:100px; height:100px; display:flex; align-items:center; justify-content:center;
+      font-size:3rem; border:2px solid var(--fg); border-radius:.4rem; cursor:pointer;
+      user-select:none; background-color: #1e293b;
+    }
+    button.basic {
+      padding:.5rem 1.2rem; border:none; border-radius:.5rem; margin-top:1rem;
+      background:var(--accent); color:#fff; font-size:1rem; cursor:pointer;
+    }
+    button.basic:hover { filter:brightness(1.1); }
   </style>
 </head>
 <body>
-  <h1>Login Tic Tac Toe</h1>
-  <input type="text" id="username" placeholder="Masukkan nama" required />
-  <button onclick="login()">Masuk</button>
+
+  <h1>Tic Tac Toe</h1>
+
+  <div>
+    <label for="mode">Pilih Mode:</label>
+    <select id="mode">
+      <option value="vsFriend">Vs Teman</option>
+      <option value="vsComputer">Vs Komputer</option>
+    </select>
+  </div>
+
+  <div id="score">Skor: <span id="playerName"></span> <span id="playerScore">0</span> – <span id="computerScore">0</span></div>
+  <div id="result"></div>
+  <div id="board"></div>
+
+  <button class="basic" onclick="resetGame()">Ulangi</button>
+  <button class="basic" onclick="logout()">Keluar</button>
 
   <script>
-    function login() {
-      const name = document.getElementById("username").value.trim();
-      if (name !== "") {
-        localStorage.setItem("playerName", name);
-        window.location.href = "game.html";
-      } else {
-        alert("Silakan masukkan nama terlebih dahulu.");
+    const board = document.getElementById("board");
+    const result = document.getElementById("result");
+    const playerScoreEl = document.getElementById("playerScore");
+    const computerScoreEl = document.getElementById("computerScore");
+    const modeSelect = document.getElementById("mode");
+    const playerNameEl = document.getElementById("playerName");
+
+    const storedName = localStorage.getItem("playerName");
+    if (!storedName) {
+      alert("Nama tidak ditemukan. Kembali ke halaman login.");
+      location.href = "index.html";
+    } else {
+      playerNameEl.textContent = storedName;
+    }
+
+    let currentPlayer = "X";
+    let cells = Array(9).fill("");
+    let gameOver = false;
+    let playerScore = 0;
+    let computerScore = 0;
+
+    function renderBoard() {
+      board.innerHTML = "";
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.textContent = cells[i];
+        cell.addEventListener("click", () => handleMove(i));
+        board.appendChild(cell);
       }
     }
+
+    function handleMove(i) {
+      if (cells[i] !== "" || gameOver) return;
+
+      const mode = modeSelect.value;
+      cells[i] = currentPlayer;
+      renderBoard();
+
+      if (checkWinner(currentPlayer)) {
+        if (currentPlayer === "X") playerScore++;
+        else computerScore++;
+        updateScore();
+        result.textContent = `${currentPlayer === "X" ? storedName : "Komputer"} menang!`;
+        gameOver = true;
+        return;
+      }
+
+      if (isDraw()) {
+        result.textContent = "Seri!";
+        gameOver = true;
+        return;
+      }
+
+      if (mode === "vsFriend") {
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+      } else if (mode === "vsComputer" && currentPlayer === "X") {
+        gameOver = true;
+        setTimeout(() => {
+          computerMove();
+          gameOver = false;
+        }, 500);
+      }
+    }
+
+    function computerMove() {
+      const empty = cells.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+      if (empty.length === 0) return;
+      const move = empty[Math.floor(Math.random() * empty.length)];
+      cells[move] = "O";
+      renderBoard();
+
+      if (checkWinner("O")) {
+        computerScore++;
+        updateScore();
+        result.textContent = "Komputer menang!";
+        gameOver = true;
+      } else if (isDraw()) {
+        result.textContent = "Seri!";
+        gameOver = true;
+      }
+    }
+
+    function checkWinner(p) {
+      const winPatterns = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      return winPatterns.some(pattern => pattern.every(i => cells[i] === p));
+    }
+
+    function isDraw() {
+      return cells.every(c => c !== "") && !checkWinner("X") && !checkWinner("O");
+    }
+
+    function updateScore() {
+      playerScoreEl.textContent = playerScore;
+      computerScoreEl.textContent = computerScore;
+    }
+
+    function resetGame() {
+      cells = Array(9).fill("");
+      result.textContent = "";
+      currentPlayer = "X";
+      gameOver = false;
+      renderBoard();
+    }
+
+    function logout() {
+      localStorage.removeItem("playerName");
+      location.href = "index.html";
+    }
+
+    renderBoard();
   </script>
 </body>
 </html>
