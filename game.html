@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tic-Tac-Toe • Game</title>
-
   <style>
     :root { --bg:#0f1828; --fg:#ffffff; --accent:#3ba2ff; }
     *{box-sizing:border-box;font-family:system-ui,Arial,sans-serif}
@@ -19,7 +18,8 @@
     }
     select#mode option{color:var(--fg);background:var(--bg)}
     #board{
-      display:grid;grid-template-columns:repeat(3,100px);gap:10px;margin-top:1rem
+      display:grid;grid-template-columns:repeat(3,100px);gap:10px;margin-top:1rem;
+      background-color:#1e293b;padding:10px;border-radius:8px;
     }
     .cell{
       width:100px;height:100px;display:flex;align-items:center;justify-content:center;
@@ -47,7 +47,6 @@
 
   <div id="score">Skor: <span id="playerName"></span> <span id="playerScore">0</span> – <span id="computerScore">0</span></div>
   <div id="result"></div>
-
   <div id="board"></div>
 
   <button class="basic" onclick="resetGame()">Ulangi</button>
@@ -61,7 +60,6 @@
     const modeSelect      = document.getElementById("mode");
     const playerNameEl    = document.getElementById("playerName");
 
-    // Ambil nama
     const storedName = localStorage.getItem("playerName");
     if (!storedName) { location.href = "index.html"; }
     else { playerNameEl.textContent = storedName; }
@@ -86,7 +84,6 @@
     function handleMove(i){
       if(cells[i]!==""||gameOver) return;
       const mode=modeSelect.value;
-
       cells[i]=currentPlayer;
       renderBoard();
 
@@ -121,17 +118,23 @@
       const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
       return w.some(c=>c.every(i=>cells[i]===p));
     }
+
     const isDraw=()=>cells.every(c=>c!=="")&&!checkWinner("X")&&!checkWinner("O");
 
     function updateScore(){
       playerScoreEl.textContent=playerScore;
       computerScoreEl.textContent=computerScore;
     }
+
     function resetGame(){
       cells=Array(9).fill(""); result.textContent="";
       currentPlayer="X"; gameOver=false; renderBoard();
     }
-    function logout(){ localStorage.removeItem("playerName"); location.href="index.html"; }
+
+    function logout(){
+      localStorage.removeItem("playerName");
+      location.href="index.html";
+    }
 
     renderBoard();
   </script>
